@@ -1,5 +1,6 @@
 const express=require('express')
-const db = require("db.js");
+const fs=require('fs')
+const db = require("dbproducts.js");
 
 const {Router}=express
 const DB = new db("data");
@@ -21,31 +22,25 @@ const Private=(req,res,next)=>{
 
 // ● GET '/api/productos' -> devuelve todos los productos.
 routerProds.get('/', async (req,res)=>{
-    const Productos= await DB.getAll()
-    res.send({Productos})
+        const Productos= await DB.getAll()
+        res.send({Productos})
 })
 
 // ● GET '/api/productos/:id' -> devuelve un producto según su id.
 routerProds.get('/:id', async(req,res)=>{
     routerProds.use(Private)
     const{id}=req.params
-    const Producto=await DB.getById(id)
-    if (Productos.indexOf(Productos[id-1])===-1){
-        res.send({ error : 'producto no encontrado' })
-    }
-    else{
-        const ProdFind=Productos[id-1]
-        res.send({ProdFind})
-    }
+
+    const ResProd= await DB.getById(id)
+    res.send({Respuesta: ResProd})
 })
 
-// ● POST '/api/productos' -> incorporar productos al listado(administrador)
-routerProds.post('/',Private, (req,res)=>{
+// ● POST '/api/productos' -> incorporar producto al listado(administrador)
+routerProds.post('/',Private, async(req,res)=>{
     const newProd= req.body
-    newProd.id=Productos.length +1
-    newProd.timesTamp=new Date.now()
-    Productos.push(newProd)
-    res.send({nuevo:newProd})
+    const msg= await DB.save(newProd)
+    res.send({message: msg})
+
 })
 
 // ● PUT '/api/productos/:id' -> recibe y actualiza un producto según su id.
@@ -64,15 +59,10 @@ routerProds.put('/:id',Private, (req,res)=>{
 })
 
 // ● DELETE '/api/productos/:id' -> elimina un producto según su id.
-routerProds.delete('/:id', (req,res)=>{
+routerProds.delete('/:id', async(req,res)=>{
     const{id}=req.params
-    if (Productos.indexOf(Productos[id-1])===-1){
-       res.send({ error : 'producto no encontrado' })
-    }
-    else{
-        Productos.splice(id-1,1)
-        res.send({Productos})
-    }
+    const msg=await DB.deleteById(id)
+    res.send({message: msg})
 })
 
 
