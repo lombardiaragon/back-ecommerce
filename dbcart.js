@@ -10,26 +10,36 @@ class CartsDB{
             const data=await fs.promises.readFile('data/carts.json','utf-8')
         
             const carritos=JSON.parse(data)
-            newCart.id= carts.length+1
-            newCart.timesTamp=new Date.now()
+            const id= carritos.length+1
+            const timesTamp=new Date().toLocaleString()
+            newCart={
+                id,
+                timesTamp
+            }
             carritos.push(newCart)
-            await fs.promises.writeFile('data/carts.json',JSON.stringify(productos))
+            await fs.promises.writeFile('data/carts.json',JSON.stringify(carritos))
 
-            return `se ha creado un nuevo carrito cuyo id es ${newCart.id}`
+            return `se ha creado un nuevo carrito cuyo id es ${id}`
         } catch (error){
             return 'error al cargar el carrito'
         }
    }
    async saveProd(id,newProd){
     try{
-        const data=fs.promises.readFile('data/carts.json')
+        const data=await fs.promises.readFile('data/carts.json')
         const carritos=JSON.parse(data)
-        const cartInCarrito=carritos.findIndex(el=>el.id===id)
-        if(cartInCarrito!==-1){
-            newProd.id=cartInCarrito.length +1
-            cartInCarrito.push(newProd)
-            await fs.promises.writeFile('data/carts.json',JSON.stringify(productos))
-            return `el producto ${newProd.name} fue agregado al carrito ${cartInCarrito.id}`
+        const carrito=carritos[id-1]
+ 
+        if(carrito){
+            if(carrito.productos==undefined){
+                carrito.productos=[]
+            }
+            const {productos}=carrito
+            newProd.id=productos.length+1
+            newProd.timesTamp=new Date().toLocaleString()
+            productos.push(newProd)
+            await fs.promises.writeFile('data/carts.json',JSON.stringify(carritos))
+            return `el producto ${newProd.nombre} fue agregado al carrito ${id}`
         }
         else{
             return `no se encontró el carrito indicado`
@@ -44,13 +54,13 @@ class CartsDB{
         try{
             const data=await fs.promises.readFile('data/carts.json','utf-8')
             const carritos=JSON.parse(data)
-            let carrito=carritos.find(el=>el.id===id)
-                if(carrito!==undefined){
-                return carrito
-                }
-                else{
-                    return 'carrito no encontrado'
-                }
+
+            if(carritos[id-1]){
+            return carritos[id-1]
+            }
+            else{
+                return 'carrito no encontrado'
+            }
         } catch(error){
             return 'error de lectura'
         }
@@ -60,14 +70,12 @@ class CartsDB{
         try{
             const data=await fs.promises.readFile('data/carts.json','utf-8')
             const carritos=JSON.parse(data)
-            let carrito=carritos.findIndex(el=>el.id===id)
            
-            if(carrito!==-1){
-                let index= carritos.indexOf(carrito)
-                carritos.splice(index,1)
-                await fs.promises.writeFile('data/carts.json',JSON.stringify(productos))
+            if(carritos[id-1]){
+                carritos.splice(id-1,1)
+                await fs.promises.writeFile('data/carts.json',JSON.stringify(carritos))
     
-                return `el carrito ${carrito.id} fue borrado exitosamente`
+                return `el carrito fue borrado exitosamente`
             }
             else{
                 return 'no se encontró el carrito indicado'
@@ -80,12 +88,18 @@ class CartsDB{
         try{
             const data=await fs.promises.readFile('data/carts.json','utf-8')
             const carritos=JSON.parse(data)
-            let carrito=carritos.findIndex(el=>el.id===id)
+            const carrito=carritos[id-1]
            
-            if(carrito!==-1){
-                const prodToDelete=carrito.findIndex(el=>el.id===id_prod) 
-                carrito.splice(prodToDelete,1) 
-                return `el carrito ${prodToDelete.id} fue borrado exitosamente`
+            if(carrito && carrito.productos!==undefined){
+                const {productos}=carrito
+                if(productos[id_prod-1]){
+                    productos.splice(id_prod-1,1) 
+                    await fs.promises.writeFile('data/carts.json',JSON.stringify(carritos))
+                    return `el producto ${id_prod} fue borrado exitosamente del carrito ${id}`
+                }
+                else{
+                    return `el producto ${id_prod} no existe en el carrito ${id}`
+                }
             }
             else{
                 return 'no se encontraron los datos indicados'

@@ -1,6 +1,5 @@
 const express=require('express')
-const fs=require('fs')
-const db = require("dbproducts.js");
+const db = require("./dbproducts.js");
 
 const {Router}=express
 const DB = new db("data");
@@ -31,8 +30,8 @@ routerProds.get('/:id', async(req,res)=>{
     routerProds.use(Private)
     const{id}=req.params
 
-    const ResProd= await DB.getById(id)
-    res.send({Respuesta: ResProd})
+    const msg= await DB.getById(id)
+    res.send({msg})
 })
 
 // ● POST '/api/productos' -> incorporar producto al listado(administrador)
@@ -44,18 +43,12 @@ routerProds.post('/',Private, async(req,res)=>{
 })
 
 // ● PUT '/api/productos/:id' -> recibe y actualiza un producto según su id.
-routerProds.put('/:id',Private, (req,res)=>{
+routerProds.put('/:id',Private, async(req,res)=>{
     const{id}=req.params
-    const updateProd=req.body
-    if (Productos.indexOf(Productos[id-1])===-1){
-        res.send({ error : 'producto no encontrado' })
-    }
-    else{
-        updateProd.id=id
-        const prevProd=Productos[id-1]
-        Productos[id-1]=updateProd
-        res.send({anterior:prevProd, nuevo:updateProd})       
-    }
+    const newProd=req.body
+
+    const msg=await DB.updateById(id,newProd)
+    res.send({message: msg})
 })
 
 // ● DELETE '/api/productos/:id' -> elimina un producto según su id.
