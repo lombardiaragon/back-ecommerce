@@ -54,9 +54,10 @@ class CartsDB{
         try{
             const data=await fs.promises.readFile('data/carts.json','utf-8')
             const carritos=JSON.parse(data)
+            const posCarrito=carritos.findIndex(el=>el.id==id)
 
-            if(carritos[id-1]){
-            return carritos[id-1]
+            if(carritos[posCarrito]){
+            return carritos[posCarrito]
             }
             else{
                 return 'carrito no encontrado'
@@ -70,9 +71,10 @@ class CartsDB{
         try{
             const data=await fs.promises.readFile('data/carts.json','utf-8')
             const carritos=JSON.parse(data)
+            const posCarrito=carritos.findIndex(el=>el.id==id)
            
-            if(carritos[id-1]){
-                carritos.splice(id-1,1)
+            if(carritos[posCarrito]){
+                carritos.splice(posCarrito,1)
                 await fs.promises.writeFile('data/carts.json',JSON.stringify(carritos))
     
                 return `el carrito fue borrado exitosamente`
@@ -88,12 +90,15 @@ class CartsDB{
         try{
             const data=await fs.promises.readFile('data/carts.json','utf-8')
             const carritos=JSON.parse(data)
-            const carrito=carritos[id-1]
+            const posCarrito=carritos.findIndex(el=>el.id==id)
+            const carrito=carritos[posCarrito]
            
             if(carrito && carrito.productos!==undefined){
                 const {productos}=carrito
-                if(productos[id_prod-1]){
-                    productos.splice(id_prod-1,1) 
+                const posProd=productos.findIndex(el=>el.id==id_prod)
+
+                if(productos[posProd]){
+                    productos.splice(posProd,1) 
                     await fs.promises.writeFile('data/carts.json',JSON.stringify(carritos))
                     return `el producto ${id_prod} fue borrado exitosamente del carrito ${id}`
                 }

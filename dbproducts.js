@@ -34,10 +34,10 @@ class ProductsDB{
         try{
             const data=await fs.promises.readFile('data/products.json','utf-8')
             const productos=JSON.parse(data)
-            const producto=productos[id-1]
+            const posProd=productos.findIndex(el=>el.id==id)
 
-                if(producto){
-                return producto
+                if(productos[posProd]){
+                return productos[posProd]
                 }
                 else{
                     return 'producto no encontrado'
@@ -50,10 +50,11 @@ class ProductsDB{
         try{
             const data= await fs.promises.readFile('data/products.json','utf-8')
             const productos=JSON.parse(data)
+            const posProd=productos.findIndex(el=>el.id==id)
 
-            if(productos[id-1]){
+            if(productos[posProd]){
                 newProd.id=id
-                productos[id-1]=newProd
+                productos[posProd]=newProd
 
                 await fs.promises.writeFile('data/products.json',JSON.stringify(productos))
                 return 'producto modificado exitosamente'
@@ -70,9 +71,10 @@ class ProductsDB{
         try{
             const data=await fs.promises.readFile('data/products.json','utf-8')
             const productos=JSON.parse(data)
+            const posProd=productos.findIndex(el=>el.id==id)
             
-            if(productos[id-1]){
-                productos.splice(id-1,1)
+            if(productos[posProd]){
+                productos.splice(posProd,1)
                 await fs.promises.writeFile('data/products.json',JSON.stringify(productos))
     
                 return `el producto fue borrado exitosamente`
